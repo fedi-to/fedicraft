@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.fedi_to.fc.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+  ],
+  "client": [
+    "ScreenMixin",
+    "OperatingSystemMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

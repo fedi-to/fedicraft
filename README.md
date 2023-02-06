@@ -1,9 +1,19 @@
-# Fabric Example Mod
+# FediCraft
 
-## Setup
+Federated network support for Minecraft! (fabric and quilt)
 
-For setup instructions please see the [fabric wiki page](https://fabricmc.net/wiki/tutorial:setup) that relates to the IDE that you are using.
+## Features
 
-## License
+On the client:
 
-This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
+- Allows federated network links to be clicked (if sent by the server)
+
+On the server:
+
+- Converts ActivityPub handles into federated network links (NYI)
+
+## Contributing
+
+This repository is licensed `MIT OR Apache-2.0`, see the two `LICENSE-*` files
+for details. Also follow the code of conduct, `CODE_OF_CONDUCT.md`, when
+participating in this space.
