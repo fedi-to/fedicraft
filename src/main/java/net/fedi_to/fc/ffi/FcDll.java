@@ -56,11 +56,17 @@ public class FcDll {
     public static boolean openUri(URI uri) {
         ByteBuffer bb = ByteBuffer.allocateDirect(size);
         bb.order(ByteOrder.nativeOrder());
-        PointerBuffer pb = PointerBuffer.allocateDirect(1);
+        PointerBuffer avalues = PointerBuffer.allocateDirect(1);
         ByteBuffer byteBuffer = MemoryUtil.memUTF8(uri.toString());
-        pb.put(byteBuffer);
         try {
-            LibFFI.ffi_call(cif, function, bb, pb);
+            PointerBuffer s = MemoryUtil.memAllocPointer(1);
+            try {
+                s.put(byteBuffer);
+                avalues.put(s);
+                LibFFI.ffi_call(cif, function, bb, avalues);
+            } finally {
+                MemoryUtil.memFree(s);
+            }
         } finally {
             MemoryUtil.memFree(byteBuffer);
         }
