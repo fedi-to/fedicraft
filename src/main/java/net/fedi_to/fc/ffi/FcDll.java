@@ -62,7 +62,9 @@ public class FcDll {
             PointerBuffer s = MemoryUtil.memAllocPointer(1);
             try {
                 s.put(byteBuffer);
+                s.flip();
                 avalues.put(s);
+                avalues.flip();
                 LibFFI.ffi_call(cif, function, bb, avalues);
             } finally {
                 MemoryUtil.memFree(s);
