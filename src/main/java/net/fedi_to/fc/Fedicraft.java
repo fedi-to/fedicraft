@@ -2,12 +2,9 @@ package net.fedi_to.fc;
 
 import com.google.common.escape.Escaper;
 import com.google.common.net.PercentEscaper;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.fedi_to.fc.resolve.AccountResolveTask;
-import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,13 +38,8 @@ public class Fedicraft implements ModInitializer {
         if (uri.getRawAuthority() == null || uri.getRawAuthority().isEmpty()) {
             return null;
         }
-        URIBuilder uriBuilder = new URIBuilder(uri);
-        uriBuilder.setScheme("https");
-        uriBuilder.setUserInfo(null);
-        uriBuilder.setPath("/.well-known/protocol-handler");
-        uriBuilder.setFragment(null);
-        uriBuilder.setCustomQuery(null);
-        return new URI(uriBuilder.toString() + "?target=" + COMPONENT_ESCAPER.escape(uri.toString()));
+        URI fallbackBase = new URI("https", null, uri.getHost(), uri.getPort(), "/.well-known/protocol-handler", null, null);
+        return new URI(fallbackBase.toString() + "?target=" + COMPONENT_ESCAPER.escape(uri.toString()));
     }
 
     @Override
