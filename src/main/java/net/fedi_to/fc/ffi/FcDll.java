@@ -15,8 +15,8 @@ import static org.lwjgl.system.MemoryUtil.memAddress;
 
 @Environment(EnvType.CLIENT)
 public class FcDll {
-    private static final SharedLibrary library;
-    private static final long function;
+    private static final SharedLibrary LIBRARY;
+    private static final long FUNCTION;
 
     static {
         SharedLibrary lib;
@@ -31,9 +31,9 @@ public class FcDll {
                 throw new IllegalStateException("Couldn't load x86 or x86_64 DLL.");
             }
         }
-        library = lib;
-        function = library.getFunctionAddress("fc_open_uri");
-        if (function == MemoryUtil.NULL) {
+        LIBRARY = lib;
+        FUNCTION = LIBRARY.getFunctionAddress("fc_open_uri");
+        if (FUNCTION == MemoryUtil.NULL) {
             throw new IllegalStateException("Couldn't find fc_open_uri function.");
         }
     }
@@ -41,7 +41,7 @@ public class FcDll {
     public static boolean openUri(URI uri) {
         ByteBuffer byteBuffer = MemoryUtil.memUTF8(uri.toString());
         try {
-            return JNI.invokePI(memAddress(byteBuffer), function) != 0;
+            return JNI.invokePI(memAddress(byteBuffer), FUNCTION) != 0;
         } finally {
             MemoryUtil.memFree(byteBuffer);
         }
