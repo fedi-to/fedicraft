@@ -36,7 +36,6 @@ public class Fedicraft implements ModInitializer {
     // FIXME IDNA
     private static final Pattern FEDI_PATTERN = Pattern.compile("@" + ACCOUNT + "@" + HOST + "(?:[ )\\]}.,;+*&'\"]|$)");
 
-    @Environment(EnvType.CLIENT)
     public static URI getFallbackUri(URI uri) throws URISyntaxException {
         // this is a bit more strict than how fedi-to does it but it's okay.
         if (uri.getRawAuthority() == null || uri.getRawAuthority().isEmpty()) {

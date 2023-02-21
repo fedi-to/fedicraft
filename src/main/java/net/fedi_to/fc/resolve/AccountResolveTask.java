@@ -23,8 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static net.fedi_to.fc.Fedicraft.COMPONENT_ESCAPER;
-import static net.fedi_to.fc.Fedicraft.LOGGER;
+import static net.fedi_to.fc.Fedicraft.*;
 
 public record AccountResolveTask(String account, String host, MinecraftServer server) implements Runnable {
     @Override
@@ -116,7 +115,11 @@ public record AccountResolveTask(String account, String host, MinecraftServer se
                     var webapcheck = HttpRequest.newBuilder();
                     webapcheck.GET();
                     try {
-                        webapcheck.uri(new URI("https://" + host + "/.well-known/protocol-handler?target=" + COMPONENT_ESCAPER.escape(webap)));
+                        URI uri = getFallbackUri(URI.create(webap));
+                        if (uri == null) {
+                            return;
+                        }
+                        webapcheck.uri(uri);
                     } catch (URISyntaxException e) {
                         return;
                     }
