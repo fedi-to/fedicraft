@@ -3,11 +3,6 @@ package net.fedi_to.fc.resolve;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.Text;
-import net.minecraft.text.Texts;
-import net.minecraft.util.Formatting;
 
 import java.io.IOException;
 import java.net.URI;
@@ -16,11 +11,15 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Locale;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
 import static net.fedi_to.fc.Fedicraft.*;
 
-public record AccountResolveTask(String account, String host, MinecraftServer server) implements Runnable {
+public record AccountResolveTask(String account, String host, Consumer<String> callback) implements Runnable {
     @Override
     public void run() {
         // this is pretty unsafe actually but we Expect these to have a restricted charset
@@ -122,12 +121,7 @@ public record AccountResolveTask(String account, String host, MinecraftServer se
                         // FIXME proxy settings
                         var status = HttpClient.newBuilder().build().send(webapcheck.build(), HttpResponse.BodyHandlers.discarding()).statusCode();
                         if (status == 200 || status == 301 || status == 302 || status == 303 || status == 307 || status == 308) {
-                            var message = Texts.bracketed(Text.literal("@" + account + "@" + host).styled(uri -> {
-                                return uri.withColor(Formatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, webap));
-                            }));
-                            server.executeSync(() -> {
-                                server.getPlayerManager().broadcast(Text.translatable("fedicraft.account.link", message), false);
-                            });
+                            callback.accept(webap);
                         } else {
                             LOGGER.warn("The server at " + host + " is not compatible with FediCraft. Not linking to @" + account + "@" + host);
                         }

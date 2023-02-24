@@ -5,6 +5,10 @@ import com.google.common.net.PercentEscaper;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.fedi_to.fc.resolve.AccountResolveTask;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.Text;
+import net.minecraft.text.Texts;
+import net.minecraft.util.Formatting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +60,15 @@ public class Fedicraft implements ModInitializer {
             FEDI_PATTERN.matcher(message.getContent().getString()).results().limit(3).map(matchResult -> {
                 var account = matchResult.group(1);
                 var host = matchResult.group(2);
-                return new AccountResolveTask(account, host, sender.getServer());
+                var server = sender.getServer();
+                return new AccountResolveTask(account, host, (webap) -> {
+                    var newMessage = Texts.bracketed(Text.literal("@" + account + "@" + host).styled(uri -> {
+                        return uri.withColor(Formatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, webap));
+                    }));
+                    server.executeSync(() -> {
+                        server.getPlayerManager().broadcast(Text.translatable("fedicraft.account.link", newMessage), false);
+                    });
+                });
             }).forEach(EXECUTOR::execute);
         });
     }
