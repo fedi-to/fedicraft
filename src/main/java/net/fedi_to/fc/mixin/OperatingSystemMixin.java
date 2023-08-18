@@ -2,6 +2,7 @@ package net.fedi_to.fc.mixin;
 
 import net.fedi_to.fc.Fedicraft;
 import net.fedi_to.fc.ffi.FcDll;
+import net.fedi_to.fc.os.Mac;
 import net.fedi_to.fc.os.NonWinMac;
 import net.minecraft.util.Util;
 import org.spongepowered.asm.mixin.Mixin;
@@ -43,8 +44,9 @@ public class OperatingSystemMixin {
                     };
                 }
                 case OSX -> {
-                    // not supported
-                    Fedicraft.LOGGER.error("Couldn't open URI '{}'", uri);
+                    if (!Mac.openUri(os, uri)) {
+                        Fedicraft.LOGGER.error("Couldn't open URI '{}'", uri);
+                    }
                 }
                 default -> {
                     if (!NonWinMac.openUri(os, uri)) {
