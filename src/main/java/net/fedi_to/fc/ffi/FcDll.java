@@ -28,17 +28,23 @@ public class FcDll {
             try {
                 lib = Library.loadNative(FcDll.class, "", "fc_x86_64.dll");
             } catch (UnsatisfiedLinkError b) {
-                throw new IllegalStateException("Couldn't load x86 or x86_64 DLL.");
+                Fedicraft.LOGGER.error("Couldn't load x86 or x86_64 DLL.");
+                lib = null;
             }
         }
         LIBRARY = lib;
-        FUNCTION = LIBRARY.getFunctionAddress("fc_open_uri");
-        if (FUNCTION == MemoryUtil.NULL) {
-            throw new IllegalStateException("Couldn't find fc_open_uri function.");
+        if (LIBRARY != null) {
+            FUNCTION = LIBRARY.getFunctionAddress("fc_open_uri");
+        } else {
+            FUNCTION = MemoryUtil.NULL;
         }
     }
 
     public static boolean openUri(URI uri) {
+        if (FUNCTION == MemoryUtil.NULL) {
+            Fedicraft.LOGGER.error("Couldn't call fc_open_uri function.");
+            return false;
+        }
         ByteBuffer byteBuffer = MemoryUtil.memUTF8(uri.toString());
         try {
             return JNI.invokePI(memAddress(byteBuffer), FUNCTION) != 0;
