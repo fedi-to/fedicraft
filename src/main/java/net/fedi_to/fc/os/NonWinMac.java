@@ -26,15 +26,17 @@ public final class NonWinMac {
             Process mime = Runtime.getRuntime().exec(new String[] {"xdg-mime", "query", "default", "x-scheme-handler/" + uri.getScheme()});
             mime.getErrorStream().close();
             mime.getOutputStream().close();
-            if (!mime.waitFor(10, TimeUnit.SECONDS)) {
-                // it should not take this long. use fallback instead.
-                Fedicraft.LOGGER.warn("protocol handler query took too long - using fallback");
-                break fallback;
-            }
-            if (mime.getInputStream().read() < 0) {
-                Fedicraft.LOGGER.debug("no protocol handler - using fallback");
-                // EOS reached - no handler exists. use fallback.
-                break fallback;
+            try (var is = mime.getInputStream()) {
+                if (!mime.waitFor(10, TimeUnit.SECONDS)) {
+                    // it should not take this long. use fallback instead.
+                    Fedicraft.LOGGER.warn("protocol handler query took too long - using fallback");
+                    break fallback;
+                }
+                if (is.read() < 0) {
+                    Fedicraft.LOGGER.debug("no protocol handler - using fallback");
+                    // EOS reached - no handler exists. use fallback.
+                    break fallback;
+                }
             }
             Fedicraft.LOGGER.info("opening protocol handler for URI '{}'", uri);
             // handler exists, use it.
