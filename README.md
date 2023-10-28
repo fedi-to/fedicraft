@@ -10,7 +10,7 @@ On the client:
 
 On the server:
 
-- Converts ActivityPub handles into federated network links (NYI)
+- Converts ActivityPub handles into federated network links
 
 ## Contributing
 
