@@ -106,27 +106,7 @@ public record AccountResolveTask(String account, String host, Consumer<String> c
                         return;
                     }
                     var webap = "web+ap" + targetUri.substring(5);
-                    var webapcheck = HttpRequest.newBuilder();
-                    webapcheck.GET();
-                    try {
-                        URI uri = getFallbackUri(URI.create(webap));
-                        if (uri == null) {
-                            return;
-                        }
-                        webapcheck.uri(uri);
-                    } catch (URISyntaxException e) {
-                        return;
-                    }
-                    try {
-                        // FIXME proxy settings
-                        var status = HttpClient.newBuilder().build().send(webapcheck.build(), HttpResponse.BodyHandlers.discarding()).statusCode();
-                        if (status == 200 || status == 301 || status == 302 || status == 303 || status == 307 || status == 308) {
-                            callback.accept(webap);
-                        } else {
-                            LOGGER.warn("The server at " + host + " is not compatible with FediCraft. Not linking to @" + account + "@" + host);
-                        }
-                    } catch (IOException | InterruptedException | JsonSyntaxException ignored) {
-                    }
+                    callback.accept(webap);
                 });
         } catch (IOException | InterruptedException | JsonSyntaxException | URISyntaxException ignored) {
         }
